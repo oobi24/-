@@ -1,0 +1,23 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Run Quant GUI",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/gui_backtest.py",
+            "console": "integratedTerminal",
+            "env": {
+                "PYTHONPATH": "${env:USERPROFILE}/AppData/Roaming/Python/Python39/site-packages;${env:ProgramData}/Anaconda3/Lib/site-packages"
+            },
+            "envFile": "${workspaceFolder}/.env"
+        },
+        {
+            "name": "Check Environment",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/check_env.py",
+            "console": "integratedTerminal"
+        }
+    ]
+}

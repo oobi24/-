@@ -1,0 +1,156 @@
+# A股量化交易系统配置文件
+
+# 数据源配置
+data_sources:
+  # 默认数据源: akshare, tushare
+  default: "akshare"
+
+  # AkShare配置
+  akshare:
+    # 无需API密钥
+    timeout: 30
+    retry_times: 3
+
+  # Tushare配置（如需使用请填写token）
+  tushare:
+    token: "YOUR_TUSHARE_TOKEN_HERE"
+    timeout: 30
+
+  # 数据存储路径
+  storage:
+    raw_data: "data/raw"
+    processed_data: "data/processed"
+    cache_days: 30
+
+# 回测配置
+backtest:
+  # 回测时间范围
+  start_date: "2018-01-01"
+  end_date: "2023-12-31"
+
+  # 初始资金
+  initial_cash: 1000000
+
+  # 交易成本
+  commission: 0.00025  # 双向万分之2.5
+  stamp_tax: 0.001     # 卖出单向千分之一印花税
+  slippage: 0.001      # 滑点千分之一
+
+  # A股特殊规则
+  rules:
+    tplus1: true       # T+1交易制度
+    limit_up_down: true # 涨跌停限制
+    suspend_filter: true # 停牌过滤
+
+# 因子配置
+factors:
+  # 因子计算窗口
+  windows:
+    short: 20    # 短期窗口
+    medium: 60   # 中期窗口
+    long: 120    # 长期窗口
+
+  # 因子标准化
+  standardization:
+    method: "zscore"  # zscore, rank, mad
+    winsorize: true   # 去极值
+    neutralization: true # 行业市值中性化
+
+  # 多因子合成
+  multi_factor:
+    method: "score"   # score, regression
+    weights:          # 初始权重（可根据IC动态调整）
+      value: 0.25
+      quality: 0.25
+      growth: 0.15
+      momentum: 0.20
+      volume_price: 0.15
+
+# 策略配置
+strategy:
+  # 股票池筛选条件
+  stock_pool:
+    # 质量因子门槛
+    min_roe: 0.10      # ROE > 10%
+    min_gross_margin: 0.20  # 毛利率 > 20%
+    cash_flow_ratio: 0.10   # 经营现金流/营业收入 > 10%
+
+    # 估值因子门槛
+    max_pe: 50         # PE < 50
+    min_dividend_yield: 0.02 # 股息率 > 2%
+
+    # 流动性门槛
+    min_market_cap: 3000000000  # 市值 > 30亿
+    min_turnover: 10000000      # 日均成交额 > 1000万
+
+  # 择时信号
+  timing:
+    # 量价动量信号
+    volume_momentum:
+      min_volume_ratio: 1.5      # 量比 > 1.5
+      breakout_h1: true          # 突破昨日高点
+      filter_downtrend: true     # 过滤下跌趋势
+
+    # 动量信号
+    momentum:
+      lookback_days: 20          # 20日动量
+      min_momentum: 0.05         # 动量 > 5%
+
+# 风控配置
+risk_control:
+  # 仓位管理
+  position:
+    max_position_ratio: 0.95     # 最大仓位比例
+    max_single_position: 0.10    # 单只股票最大仓位
+    atr_multiplier: 0.01         # ATR仓位系数
+
+  # 止损规则
+  stop_loss:
+    price_stop: 0.08             # 价格止损 8%
+    time_stop: 10                # 时间止损 10天
+    trailing_stop: 0.15          # 移动止损 15%
+
+  # 风险限制
+  limits:
+    max_drawdown: 0.30           # 最大回撤限制 30%
+    var_95: 0.05                 # 95% VaR限制 5%
+
+# 实盘交易配置
+trading:
+  # 交易接口
+  broker: "qmt"  # qmt, ptrade, manual
+
+  # QMT配置
+  qmt:
+    path: "C:/国金证券QMT交易端/userdata_mini"
+    account: "your_account"
+
+  # 交易时间
+  trade_time:
+    morning_start: "09:30"
+    morning_end: "11:30"
+    afternoon_start: "13:00"
+    afternoon_end: "15:00"
+
+  # 订单设置
+  order:
+    price_type: "limit"  # limit, market
+    validity: "day"      # day, gtc
+    retry_times: 3
+
+# 日志配置
+logging:
+  level: "INFO"
+  file: "logs/quant_system.log"
+  rotation: "1 day"
+  retention: "30 days"
+
+# 通知配置
+notification:
+  enabled: false
+  wechat_webhook: "your_webhook_url"
+  email:
+    enabled: false
+    smtp_server: "smtp.example.com"
+    sender: "your_email@example.com"
+    receivers: ["receiver@example.com"]
